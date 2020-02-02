@@ -1,0 +1,66 @@
+
+#base {
+}
+
+.calculator {
+  width: 400px;
+  height: 500px;
+
+  border: 3px solid black;
+  border-radius: 12px;
+}
+
+.calculator .window {
+  height: 11%;
+  width: 94%;
+  margin: 1%;
+  background: #ddd;
+  content: "";
+  font-size: 20px;
+  text-align: right;
+
+  padding: 1%;
+
+  outline: none;
+  border-radius: 12px;
+  border-style: none;
+}
+
+.calculator input:focus {
+  outline: none;
+}
+
+.calculator .pad {
+  height: 85%;
+  width: 100%;
+}
+
+.calculator .pad * {
+  float: left;
+}
+
+.calculator button {
+  width: 28%;
+  height: 13%;
+  background: #d4d4e8;
+  border-radius: 12%;
+  margin: 2%;
+  border: none;
+  font-size: 30px;
+}
+
+.calculator .blank {
+  visibility: hidden;
+}
+
+.calculator button:focus {
+  outline: none;
+}
+
+.calculator button:active {
+  background: #335;
+}
+
+.calculator .equals {
+  background: #38f;
+}
