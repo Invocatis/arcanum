@@ -1,3 +1,3 @@
-(defn arcanummodule.app.wiring)
+(defn arcanum.module.app.wiring)
 
 (def wiring)

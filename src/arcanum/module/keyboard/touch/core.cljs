@@ -1,9 +1,9 @@
-(ns arcanummodule.keyboard.touch.core
+(ns arcanum.module.keyboard.touch.core
   (:require
     [retort.core :as r]
-    [arcanummodule.keyboard.touch.controller :as controller]
-    [arcanummodule.keyboard.touch.view :as view]
-    [arcanummodule :as module]))
+    [arcanum.module.keyboard.touch.controller :as controller]
+    [arcanum.module.keyboard.touch.view :as view]
+    [arcanum.module :as module]))
 
 (defn module
   [state & [keymap]]

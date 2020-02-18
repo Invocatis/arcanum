@@ -1,4 +1,4 @@
-(ns arcanummodule.app.view)
+(ns arcanum.module.app.view)
 
 (defn view
   [{:keys [name content]}]

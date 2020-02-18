@@ -1,8 +1,8 @@
-(ns arcanumcomponents.wheel.component
+(ns arcanum.components.wheel.component
   (:require
     [retort.core :as retort]
-    [arcanumcomponents.wheel.view :refer [view]]
-    [arcanumcomponents.wheel.design :refer [design]]))
+    [arcanum.components.wheel.view :refer [view]]
+    [arcanum.components.wheel.design :refer [design]]))
 
 (defn component
   [state]

@@ -1,6 +1,6 @@
-(ns arcanummodule.keyboard.touch.controller
+(ns arcanum.module.keyboard.touch.controller
   (:require
-    [arcanummodule :as module]))
+    [arcanum.module :as module]))
 
 (defn transition
   [module]

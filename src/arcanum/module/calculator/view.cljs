@@ -1,4 +1,4 @@
-(ns arcanummodule.calculator.view
+(ns arcanum.module.calculator.view
   (:require
     [retort.core :as retort]))
 

@@ -1,4 +1,4 @@
-(ns arcanummodule.pane.border.core)
+(ns arcanum.module.pane.border.core)
 
 (defn module
   [state])

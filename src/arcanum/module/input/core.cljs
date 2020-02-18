@@ -1,6 +1,6 @@
-(ns arcanummodule.input.core
+(ns arcanum.module.input.core
   (:require
-    [arcanummodule :as module]))
+    [arcanum.module :as module]))
 
 (defn- pop*
   [v]

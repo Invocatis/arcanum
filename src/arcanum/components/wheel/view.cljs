@@ -1,8 +1,8 @@
-(ns arcanumcomponents.wheel.view
+(ns arcanum.components.wheel.view
   (:require
     [goog.string :as gstring :refer [format]]
     [goog.string.format]
-    [arcanumcomponents.wheel.util :refer [sin cos pi polar->cartesian sqrt squared]]))
+    [arcanum.components.wheel.util :refer [sin cos pi polar->cartesian sqrt squared]]))
 
 (defn arc
   [x y radius width start-angle end-angle]

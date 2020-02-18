@@ -1,1 +1,0 @@
-(ns arcanummodules.snake.view)

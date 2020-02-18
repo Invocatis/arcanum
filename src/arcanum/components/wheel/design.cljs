@@ -1,6 +1,6 @@
-(ns arcanumcomponents.wheel.design
+(ns arcanum.components.wheel.design
   (:require
-    [arcanumcomponents.wheel.util :as util :refer [acos distance pi]]))
+    [arcanum.components.wheel.util :as util :refer [acos distance pi]]))
 
 (defn data
   [state]

@@ -1,9 +1,9 @@
-(ns arcanummodule.calculator.core
+(ns arcanum.module.calculator.core
   (:require
     [retort.core :as r]
-    [arcanummodule.calculator.view :as view]
-    [arcanummodule.calculator.controller :as controller]
-    [arcanummodule :as module]))
+    [arcanum.module.calculator.view :as view]
+    [arcanum.module.calculator.controller :as controller]
+    [arcanum.module :as module]))
 
 (defn module
   [state]

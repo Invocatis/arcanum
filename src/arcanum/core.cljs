@@ -1,22 +1,23 @@
-(ns arcanumcore
+(ns arcanum.core
   (:require
     [reagent.core :as reagent]
     [retort.core :as retort]
-    [arcanummodule :as module]
-    [arcanummodule.calculator.core :as calculator]
-    [arcanummodule.keyboard.touch.core :as keyboard]
-    [arcanummodule.input.core :as input]
-    [arcanummodule.swappane.core :as swappane :refer [swappane]]
-    [arcanumcomponents.selector.tabs.core :refer [tabs]]
-    [arcanumcomponents.wheel.component :as wheel]
-    [hiccup-icons.fa :as fa]))
+    [arcanum.module :as module]
+    [arcanum.util :as util]
+    [arcanum.module.calculator.core :as calculator]
+    [arcanum.module.keyboard.touch.core :as keyboard]
+    [arcanum.module.input.core :as input]
+    [arcanum.components.wheel.component :as wheel]
+    [hiccup-icons.fa :as fa]
+    [arcanum.module.notification.core :as notification]
+    [arcanum.css.animation]
+    [arcanum.module.panel.core :as panel]
+    [arcanum.module.data.toggle.components :as toggle]
+    [arcanum.module.data.value.core :as value]
+    [arcanum.module.data.value.map :as mapper]
+    [arcanum.pos.module.tabpage.core :as tabpage]))
 
 (def test-state (atom {:selections {} :order []}))
-
-(defn data
-  []
-  {:swappane {:args [test-state]}
-   :tabs {:target (swappane/module test-state)}})
 
 (def wheel (wheel/component (reagent/atom nil)))
 (def show (reagent/atom nil))
@@ -35,15 +36,21 @@
     [wheel (merge params {:radius 200 :width :80})]
     (map (fn [n] {:id n :content [:h1 n] :icon [:h1 n]}) (range 0 2))))
 
+; (defn base
+;   []
+;   [:div {:on-mouse-down (fn [ev] (println show) (reset! show [(.-pageX ev) (.-pageY ev)]))
+;          :on-mouse-up #(reset! show nil)
+;          :style {:height "100vh" :width "100vw"}}
+;    (when-let [[x y] @show]
+;      [w {:x x :y y}])])
+
+
+
 (defn base
   []
-  [:div {:on-mouse-down (fn [ev] (println show) (reset! show [(.-pageX ev) (.-pageY ev)]))
-         :on-mouse-up #(reset! show nil)
-         :style {:height "100vh" :width "100vw"}}
-   [:div.x]
-   (when-let [[x y] @show]
-     [w {:x x :y y}])])
-   ; [:button {:style {:clip-path "circle(100px at center)" :width "300px" :height "300px" :position :absolute :left "360px" :top "360px" :z-index 1} :on-click #(swap! show not)}]
+  [:div {:style {:height "100vh" :width "100vw" :position :absolute :top 0}}
+    [:style arcanum.css.animation/css]
+    [tabpage/view {}]])
 
 
 (defn render

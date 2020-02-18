@@ -1,6 +1,6 @@
-(ns arcanummodule.calculator.controller
+(ns arcanum.module.calculator.controller
   (:require
-    [arcanummodule :as module]))
+    [arcanum.module :as module]))
 
 (defn data
   [module]
