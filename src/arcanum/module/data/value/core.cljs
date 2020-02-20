@@ -1,7 +1,8 @@
 (ns arcanum.module.data.value.core)
 
 (defn module
-  [state]
+  [state & [{:keys [default] :or {default nil}}]]
+  (reset! state default)
   {:state {:default nil
            :atom state}
    :api

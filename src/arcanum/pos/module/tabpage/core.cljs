@@ -19,20 +19,20 @@
 
 (def last-item (value/module (reagent/atom nil)))
 
-(def item-list (mapper/module (value/module (reagent/atom [])) util/group-count :get))
+; (def item-list (mapper/module (value/module (reagent/atom [])) util/group-count :get))
 
 (def select (select/module (reagent/atom nil)))
 
 (def select-button (select/button select))
 
 (defn item-button
-  [n])
-;   [:button.item-button {:on-click #(do (module/call! last-item :set n)
-;                                        (module/call! notifications :notification {:dismiss fa/beer-solid})
-;                                        (module/call! item-list :update conj n)
-;                                        (util/unique-timeout ::last-item
-;                                                             (fn [] (module/call! last-item :set nil)) 1500))}
-;     n])
+  [{:keys [items] :as attrs} n])
+  ; [:button.item-button {:on-click #(do ;(module/call! last-item :set n)
+  ;                                      ;(module/call! notifications :notification {:dismiss fa/beer-solid})
+  ;                                      (module/call! items :update conj n)
+  ;                                      (util/unique-timeout ::last-item
+  ;                                                           (fn [] (module/call! last-item :set nil)) 1500))}
+  ;   n])
 
 (defn item-entry
   [{:keys [value count] :as params}]
@@ -43,7 +43,7 @@
 (def items ["Pilsner" "Is this beer?" "Stout" "Porter" "Ipa" "Jort Munder" "Muncheez" "Knowledge is Sour" "Always Cloudy" "Alpaca Kisses" "Altbier" "Milkshake Jacuzzi"])
 
 (defn menu
-  []
+  [{:keys [items] :as attrs}]
   [:div.menu
    {}
    (into
@@ -53,7 +53,7 @@
        [select-button {:value :taster} mdi/glass-tulip]
        [select-button {:value :growler} icons/jug]
        [select-button {:value :crowler} icons/can]]]
-    (map item-button items))])
+    (map (partial item-button {:items items}) items))])
 
 (defn viewx
   [params]
@@ -67,8 +67,8 @@
       ; [(:core (notification/view notifications)) {:side "left"}
        [:div.y
         [:div.panel
-         [:div.x [:button.toggle {:class "close"} fa/chevron-left-solid]
-          (into [:div.item-list] (map (fn [[i c]] [item-entry {:value i :count c}]) (module/call! item-list :get)))]]]]]])
+         [:div.x [:button.toggle {:class "close"} fa/chevron-left-solid]]]]]]])
+          ; (into [:div.item-list] (map (fn [[i c]] [item-entry {:value i :count c}]) (module/call! item-list :get)))]]]]]])
 
 
 (defn b
@@ -89,9 +89,10 @@
     [:button.toggle.items
      {:alchemy {:module :tabpage-item-list :as :toggle}}
      fa/th-list-solid]
-    [:div.panel {:alchemy {:module :tabpage-item-list :as :toggle}}
-     [:div.panel-content [:button.toggle {:class "close"} fa/chevron-left-solid]
-      [item-list {:alchemy {:module :tabpage-item-list :call :get :args [] :as :items}}]]]
+    [:module#item-list.value {}
+      [:div.panel {:alchemy {:module :tabpage-item-list :as :toggle}}
+       [:div.panel-content [:button.toggle {:class "close"} fa/chevron-left-solid]
+        [item-list {:alchemy {:module :item-list :call :get :args [] :as :items}}]]]]
 
     [:module#item-list-notification.notification {:timeout 11000}
      [:div.notifications {:alchemy {:module :item-list-notification :as :notification}}]

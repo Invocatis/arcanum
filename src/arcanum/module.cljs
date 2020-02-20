@@ -60,7 +60,6 @@
 
 (defn instantiate!
   [name module state attributes]
-
   (let [instance (module state attributes)]
     (swap! instances assoc name instance)
     instance))

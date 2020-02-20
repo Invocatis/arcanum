@@ -17,4 +17,5 @@
     ; (module/register! keyboard/module :keyboard)
     (module/register! toggle/module :toggle)
     (module/register! notification/module :notification)
+    (module/register! value/module :value)
     (component/register! panel/component :panel)))
