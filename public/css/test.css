@@ -1,3 +1,14 @@
+
+.notifier {
+  width: 200px;
+  height: 100px;
+  background: #666;
+}
+
+.notifier:active {
+  background: #333;
+}
+
 button {
   outline: none;
   border: none;
@@ -101,7 +112,7 @@ button {
 .panel > .content {
 }
 
-.panel > .content > .x {
+.panel > .content > .panel-content {
   position: absolute;
   top: 0;
   height: 95%;
@@ -116,7 +127,7 @@ button {
   opacity: 80%;
 }
 
-.panel > .content > .x > .close {
+.panel > .content > .panel-content > .close {
   position: absolute;
   right: 70%;
   width: 80px;
@@ -133,6 +144,18 @@ button {
   height: 60px;
   text-align: center;
   margin-bottom: 10px;
+  animation-name: shrink-y;
+  animation-duration: 0.5s;
+  animation-delay: 1s;
+  background: red;
+}
+
+
+@keyframes shrink-y {
+  to {
+    height: 0;
+    font-size: 0;
+  }
 }
 
 .notification > .content {

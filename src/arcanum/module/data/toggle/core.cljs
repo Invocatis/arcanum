@@ -8,16 +8,14 @@
   [state & [{:keys [toggler default] :or {default false toggler not}}]]
   (let [value (value/module state)]
     (reset! state default)
-    {:state {:default default
+    {:name :toggle
+     :state {:default default
              :atom state}
      :extends [value]
      :api {:toggle #(module/call! value :update toggler)
-           :value #(module/call! value :get)}}))
-
-(defn button
-  [module]
-  (fn [params text]
-    [:button (assoc params
-                    :on-click #(module/call! module :toggle)
-                    :status (module/call! module :get))
-      text]))
+           :value #(module/call! value :get)}
+     :design {:data
+              {:.toggle
+               (fn [{:keys [toggle]}]
+                 {:on-click #(module/call! toggle :toggle)
+                  :status (module/call! toggle :get)})}}}))

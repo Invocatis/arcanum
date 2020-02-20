@@ -1,4 +1,8 @@
-(ns arcanum.module)
+(ns arcanum.module
+  (:require
+   [arcanum.util :refer [subatom]]
+   [retort.core :as retort]
+   [retort.hiccup :as hiccup]))
 
 (defn distinct-by
   [f coll]
@@ -11,18 +15,6 @@
                         (cons x (step (rest s) (conj seen x))))))
                   xs seen)))]
     (step coll #{})))
-
-(def modules (atom #{}))
-
-(defn register!
-  [module]
-  (swap! modules conj module))
-
-(defn emit!
-  [event & args]
-  (doseq [module @modules]
-    (when-let [listener (-> module :listen (get event))]
-      (apply listener args))))
 
 (defn -call
   [module point args]
@@ -56,3 +48,58 @@
 (defn state
   [module]
   (-> module :state :atom))
+
+
+(def modules (atom {}))
+
+(defn register!
+  [module id]
+  (swap! modules assoc id module))
+
+(def instances (atom {}))
+
+(defn instantiate!
+  [name module state attributes]
+
+  (let [instance (module state attributes)]
+    (swap! instances assoc name instance)
+    instance))
+
+(defn instantiate-or-get!
+  [name module state attributes]
+  (locking instances
+    (or (get @instances name)
+        (instantiate! name module state attributes))))
+
+(defn emit!
+  [event & args]
+  (doseq [module @modules]
+    (when-let [listener (-> module :listen (get event))]
+      (apply listener args))))
+
+(defn mmm
+  [alchemy instance class]
+  (let [{:keys [module call args] :or {args [] }} alchemy]
+    (if call
+      (apply call! instance call args)
+      instance)))
+
+(defn mm
+  [class instance [tag {:keys [alchemy] :as params} & children :as hiccup]]
+  (let [{:keys [as] :or {as class}} alchemy]
+    (into [tag (assoc (dissoc params :alchemy) as (mmm alchemy instance class))] children)))
+
+(defn mold-module
+  [state modules [tag attributes & children :as hiccup]]
+  (let [id (keyword (hiccup/id hiccup))
+        class (keyword (first (hiccup/classes hiccup)))
+        state (subatom state [class id])
+        module (get @modules class)
+        instance (instantiate-or-get! id module state attributes)]
+    {:hiccup (into [:<>] children)
+     :design #(retort/design-merge % (:design instance) {:mold {[{:alchemy {:module id}}] (partial mm class instance)}})}))
+
+(defn design
+  [state]
+  {:mold
+   {:module (partial mold-module state modules)}})

@@ -8,7 +8,6 @@
    [arcanum.module :as module]
    [arcanum.util :as util]
    [arcanum.module.notification.core :as notification]
-   [arcanum.module.panel.core :as panel]
    [arcanum.module.data.toggle.core :as toggle]
    [arcanum.module.data.value.core :as value]
    [arcanum.module.data.value.map :as mapper]
@@ -16,10 +15,7 @@
 
 
 
-(def notifications (notification/module (reagent/atom {:order #queue []})))
-
 (def toggle (toggle/module (reagent/atom false) {:default "close" :toggler #(if (= % "close") "open" "close")}))
-(def panel (panel/module toggle))
 
 (def last-item (value/module (reagent/atom nil)))
 
@@ -30,13 +26,13 @@
 (def select-button (select/button select))
 
 (defn item-button
-  [n]
-  [:button.item-button {:on-click #(do (module/call! last-item :set n)
-                                       (module/call! notifications :notification {:dismiss fa/beer-solid})
-                                       (module/call! item-list :update conj n)
-                                       (util/unique-timeout ::last-item
-                                                            (fn [] (module/call! last-item :set nil)) 1500))}
-    n])
+  [n])
+;   [:button.item-button {:on-click #(do (module/call! last-item :set n)
+;                                        (module/call! notifications :notification {:dismiss fa/beer-solid})
+;                                        (module/call! item-list :update conj n)
+;                                        (util/unique-timeout ::last-item
+;                                                             (fn [] (module/call! last-item :set nil)) 1500))}
+;     n])
 
 (defn item-entry
   [{:keys [value count] :as params}]
@@ -59,18 +55,44 @@
        [select-button {:value :crowler} icons/can]]]
     (map item-button items))])
 
-(defn view
+(defn viewx
   [params]
-  (retort/brew
-   (panel/design toggle)
-   [:div.tabpage params
+  [:div.tabpage params
+   [:module#tabpage-item-list.toggle {:default "close" :toggler #(if (= % "close") "open" "close")}
     [:button.close mdi/close-circle]
     (let [last-item (or (module/call! last-item :get) "")]
       [:div.last-item {:value last-item} last-item])
     [menu]
-    [(:core (notification/view notifications)) {:side "left"}
-     [:div.y
-      [:div.panel {}
-       [:div.x [(toggle/button toggle) {:class "close"} fa/chevron-left-solid]
-        (into [:div.item-list] (map (fn [[i c]] [item-entry {:value i :count c}]) (module/call! item-list :get)))]]
-      [(toggle/button toggle) {:class "items" :status (module/call! toggle :get)} fa/th-list-solid]]]]))
+    [:module#items.notification
+      ; [(:core (notification/view notifications)) {:side "left"}
+       [:div.y
+        [:div.panel
+         [:div.x [:button.toggle {:class "close"} fa/chevron-left-solid]
+          (into [:div.item-list] (map (fn [[i c]] [item-entry {:value i :count c}]) (module/call! item-list :get)))]]]]]])
+
+
+(defn b
+  [{:keys [notification]} & children]
+  (println notification)
+  (into [:button.notifier {:on-click #(module/call! notification :notification {:key :asdf :content [:h1 "hello"]})}] children))
+
+(defn item-list
+  [{:keys [items] :as params}]
+  (into
+    [:div.item-list (dissoc params :items)]
+    (map (fn [[i c]] [item-entry {:value i :count c}]) items)))
+
+(defn view
+  [params]
+  [:div.tabpage params
+   [:module#tabpage-item-list.toggle {:default "close" :toggler #(if (= % "close") "open" "close")}
+    [:button.toggle.items
+     {:alchemy {:module :tabpage-item-list :as :toggle}}
+     fa/th-list-solid]
+    [:div.panel {:alchemy {:module :tabpage-item-list :as :toggle}}
+     [:div.panel-content [:button.toggle {:class "close"} fa/chevron-left-solid]
+      [item-list {:alchemy {:module :tabpage-item-list :call :get :args [] :as :items}}]]]
+
+    [:module#item-list-notification.notification {:timeout 11000}
+     [:div.notifications {:alchemy {:module :item-list-notification :as :notification}}]
+     [b {:alchemy {:module :item-list-notification :as :notification}}]]]])

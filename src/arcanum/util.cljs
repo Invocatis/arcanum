@@ -5,7 +5,6 @@
 
 (defn unique-timeout
   [key f time]
-  (println key)
   (when-let [timeout (get @state key)]
     (js/clearTimeout timeout))
   (swap! state assoc key (js/setTimeout f time)))

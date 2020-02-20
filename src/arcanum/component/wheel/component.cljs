@@ -1,4 +1,4 @@
-(ns arcanum.components.wheel.component
+(ns arcanum.component.wheel.component
   (:require
     [retort.core :as retort]
     [arcanum.components.wheel.view :refer [view]]

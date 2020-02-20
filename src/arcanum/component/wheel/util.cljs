@@ -1,4 +1,4 @@
-(ns arcanum.components.wheel.util)
+(ns arcanum.component.wheel.util)
 
 (def pi
   (.-PI js/Math))

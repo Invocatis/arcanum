@@ -1,4 +1,4 @@
-(ns arcanum.components.wheel.design
+(ns arcanum.component.wheel.design
   (:require
     [arcanum.components.wheel.util :as util :refer [acos distance pi]]))
 

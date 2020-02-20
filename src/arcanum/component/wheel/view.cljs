@@ -1,4 +1,4 @@
-(ns arcanum.components.wheel.view
+(ns arcanum.component.wheel.view
   (:require
     [goog.string :as gstring :refer [format]]
     [goog.string.format]
