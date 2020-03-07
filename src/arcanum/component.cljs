@@ -10,4 +10,8 @@
 
 (defn design
   []
-  (->> @components vals (map :design) (reduce retort/design-merge)))
+  (->> @components vals (map :design) vec))
+
+(defn style
+  []
+  (->> @components vals (map :style) (map (fn [s] [:style s])) (into [:<>])))

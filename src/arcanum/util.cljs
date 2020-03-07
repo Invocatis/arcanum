@@ -9,14 +9,12 @@
     (js/clearTimeout timeout))
   (swap! state assoc key (js/setTimeout f time)))
 
-(defn piggyback
-  [key f])
-
 (defn group-count
   [xs]
   (if (empty? xs)
-    {}
-    (reduce (fn [counts x] (update counts x #(inc (or % 0)))) {} xs)))
+    []
+    (let [counts (reduce (fn [counts x] (update counts x #(inc (or % 0)))) {} xs)]
+      (into [] (map (fn [x] [x (get counts x)]) (distinct xs))))))
 
 (deftype SubAtom [base path meta]
   Object

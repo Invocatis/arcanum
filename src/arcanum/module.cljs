@@ -78,10 +78,12 @@
 
 (defn mmm
   [alchemy instance class]
-  (let [{:keys [module call args] :or {args [] }} alchemy]
-    (if call
-      (apply call! instance call args)
-      instance)))
+  (if (vector? alchemy)
+    (reduce merge {} (map #(mmm % instance class) alchemy))
+    (let [{:keys [module call args] :or {args [] }} alchemy]
+      (if call
+        (apply call! instance call args)
+        instance))))
 
 (defn mm
   [class instance [tag {:keys [alchemy] :as params} & children :as hiccup]]
@@ -96,9 +98,75 @@
         module (get @modules class)
         instance (instantiate-or-get! id module state attributes)]
     {:hiccup (into [:<>] children)
-     :design #(retort/design-merge % (:design instance) {:mold {[{:alchemy {:module id}}] (partial mm class instance)}})}))
+     :design #(retort/design-merge % (:design instance) {:mold {{:alchemy {:module id}} (partial mm class instance)}})}))
 
 (defn design
   [state]
   {:mold
    {:module (partial mold-module state modules)}})
+
+
+; (deftype Module [module]
+;   Object
+;   (toString [this]
+;     (pr-str module))
+;
+;   IWithMeta
+;   (-with-meta [coll meta] (-with-meta coll meta))
+;
+;   IMeta
+;   (-meta [coll] (-meta coll))
+;
+;   ICollection
+;   (-conj [coll entry]
+;     (-conj coll entry))
+;
+;   IEmptyableCollection
+;   (-empty [coll] (-empty coll))
+;
+;   IEquiv
+;   (-equiv [coll other] (-equiv coll other))
+;
+;   IHash
+;   (-hash [coll] (-hash coll))
+;
+;   ISeqable
+;   (-seq [coll]
+;     (-seq coll))
+;
+;   ICounted
+;   (-count [coll] (-count coll))
+;
+;   ILookup
+;   (-lookup [coll k]
+;     (-lookup coll k nil))
+;
+;   (-lookup [coll k not-found]
+;     (-lookup coll k not-found))
+;
+;   IAssociative
+;   (-assoc [coll k v]
+;     (-assoc coll k v))
+;
+;   (-contains-key? [coll k]
+;     (-contains-key? coll k))
+;
+;   IMap
+;   (-dissoc [coll k]
+;     (-dissoc coll k))
+;
+;   IKVReduce
+;   (-kv-reduce [coll f init]
+;     (-kv-reduce coll f init))
+;
+;   IFn
+;   (-invoke
+;    [a]
+;    (println a))
+;
+;   (-invoke [coll k not-found]
+;     (-lookup coll k not-found))
+;
+;   IEditableCollection
+;   (-as-transient [coll]
+;     (-as-transient coll)))

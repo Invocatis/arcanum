@@ -17,5 +17,5 @@
      :design {:data
               {:.toggle
                (fn [{:keys [toggle]}]
-                 {:on-click #(module/call! toggle :toggle)
-                  :status (module/call! toggle :get)})}}}))
+                 {:on-mouse-down #(module/call! toggle :toggle)})}}}))
+                  ; :status (module/call! toggle :get)})}}}))

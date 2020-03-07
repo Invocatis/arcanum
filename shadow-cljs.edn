@@ -1,6 +1,6 @@
 {:builds
  {:app {:asset-path "/js"
-        :modules {:main {:init-fn arcanum.core/-main}}
+        :modules {:main {:init-fn pos.core/-main}}
         :output-dir "public/js"
         :target :browser}
   :cards {:asset-path "/js"

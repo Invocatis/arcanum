@@ -1,4 +1,4 @@
-(ns arcanum.pos.module.menu.core
+(ns pos.module.menu.core
   (:require
     [retort.core :as r]
     [arcanum.module.menu.view :as view]

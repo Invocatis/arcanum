@@ -1,4 +1,8 @@
 
+body {
+  background: #eef;
+}
+
 .notifier {
   width: 200px;
   height: 100px;
@@ -12,6 +16,45 @@
 button {
   outline: none;
   border: none;
+}
+
+.tabpage {
+  width: 100%;
+  height: 100%;
+}
+
+.tabpage > .options {
+  position: absolute;
+  right: 2%;
+}
+
+.tabpage > .options > * {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.tabpage > .options > button:active {
+  background-color: #336699;
+}
+
+.tabpage > .options > .back {
+  background: #e84e27;
+  width: 180px;
+  height: 80px;
+  box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
+  border-bottom-left-radius: 10%;
+  border-bottom-right-radius: 10%;
+  font-size: 50pt;
+}
+
+.tabpage > .options > .close {
+  background: #e84e27;
+  width: 180px;
+  height: 80px;
+  box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
+  border-bottom-left-radius: 10%;
+  border-bottom-right-radius: 10%;
+  font-size: 50pt;
 }
 
 .items {
@@ -30,14 +73,48 @@ button {
   display: none;
 }
 
+.item-section {
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 30px;
+  margin-bottom: 20px;
+  background: #336;
+  box-shadow: 1px 2px 3px 1px rgba(20,20,20,0.75);
+  transition: transform 0.15s ease-out;
+  transform-origin: top center;
+}
+
+.item-section[status="hidden"] {
+  transform: scaleY(0);
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  position: absolute;
+  width: 80%;
+}
+
+.item-section[status="hidden"] * {
+  transform: scaleY(0);
+  transition: transform 0.15s ease-in-out;
+}
+
+.item-section > .header {
+  margin-left: 3%;
+  text-transform: capitalize;
+  font-size: 16pt;
+  color: #cccce0;
+}
+
 .item-entry {
-  background: #e84e27;
-  margin: 10px;
-  height: 30px;
-  width: 90%;
+  background: #cccce0;
+  margin-top: 10px;
+  height: 40px;
+  width: 80%;
   margin-left: 3%;
   padding-top: 10px;
   padding-left: 20px;
+  font-size: 16pt;
+  text-shadow: 1px 1px rgba(100,100,255,.35);
 }
 
 .item-entry > .count {
@@ -49,17 +126,32 @@ button {
 .item-entry > .value {
   float: left;
   height: 100%;
-  width: 90%;
+  width: calc(90% - 50px);
+}
+
+.item-entry > .remove {
+  color: #cccce0;
+  background: none;
+  font-size: 20pt;
+  float: left;
+  width: 50px;
+  height: 50px;
+  transform: translate(50px,-10px);
+  border: 1px solid #cccce0;
+}
+
+.item-entry > .remove:active {
+  color: #e84e27;
 }
 
 .items:active {
-  background: blue;
+  background: #338;
 }
 
 
 .last-item {
   margin-top: 10px;
-  transition: all 0.25s ease;
+  transition: all 0.15s ease;
   width: 250px;
   height: 40px;
   background: #e84e27;
@@ -68,8 +160,6 @@ button {
   font-size: 16pt;
   padding-top: calc(20px - 10pt);
   padding-left: 18px;
-  transition-property: all;
-  transition-duration: 0.3s;
   box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
 }
 
@@ -86,55 +176,34 @@ button {
 
 .panel {
   position: absolute;
-  z-index: 0;
-  width: 100%;
   height: 100%;
-}
-
-.panel * {
-  transition: all .3s ease-in-out;
-}
-
-.panel[status="close"] > .content {
-  display: inline !important;
-  width: 0px;
-  height: 0px;
-  position: absolute;
-  top: 5%;
-}
-
-.panel[status="close"] > .background {
-  display: inline !important;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.panel > .content {
-}
-
-.panel > .content > .panel-content {
-  position: absolute;
-  top: 0;
-  height: 95%;
-  width: 30%;
-  background: #444;
+  width: 55%;
+  transition: all 0.15s ease-in-out;
+  /* top: calc(50% - 150px);
+  left: calc(50% - 300px); */
+  background: #445;
   overflow: scroll;
 }
 
-.panel > .background {
-  background: #000;
-  transition: all 0.45s ease-out;
-  opacity: 80%;
+.panel[status="close"] {
+  display: inline !important;
+  width: 0px;
+  position: absolute;
 }
 
-.panel > .content > .panel-content > .close {
-  position: absolute;
-  right: 70%;
-  width: 80px;
-  height: 80px;
-  /* background: #444; */
-  font-size: 30pt;
-  display: none;
+.background[status="close"] {
+  display: inline !important;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+}
+
+.panel[status="open"] {
+  /* box-shadow: 3px 2px 3px 1px rgba(100,100,100,0.75); */
+}
+
+.background {
+  background: rgba(0,0,0,0.85);
+  transition: all 0.225s ease-out;
 }
 
 /* ---------------------------------- */
@@ -171,18 +240,38 @@ button {
   box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
 }
 
-.tabpage .close {
-  background: #e84e27;
-  width: 6%;
-  height: 8%;
-  position: absolute;
-  top: 0;
-  right: 10%;
-  border-bottom-left-radius: 10%;
-  border-bottom-right-radius: 10%;
-  font-size: 4em;
-  padding-top: 3px;
-  box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
+/* ---------------------------------- */
+
+.side-panel > * {
+  float: left;
+}
+
+.side-panel .select {
+  width: 4%;
+  left: 10px;
+  position: fixed;
+  top: 30px;
+
+}
+
+
+.side-panel .option {
+  width: 60px;
+  height: 60px;
+  font-size: 30pt;
+  margin-bottom: 40px;
+  color: #cccce0;
+  background: rgba(0,0,0,0);
+}
+
+.side-panel .option[status="selected"] {
+  color: #e84e27;
+}
+
+.item-list {
+  padding-top: 5%;
+  margin-left: 13%;
+  width: 80%;
 }
 
 /* ---------------------------------- */
@@ -194,13 +283,14 @@ button {
   width: 90%;
 }
 
-.menu .selectors {
+
+.menu .select {
   width: 15%;
   height: 100%;
   float: left;
 }
 
-.menu .selector {
+.menu .main .option {
   font-size: 40pt;
   width: 100%;
   height: 25%;
@@ -208,7 +298,7 @@ button {
   box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
 }
 
-.menu .selector[status="selected"] {
+.menu .option[status="selected"] {
   background-color: #336699;
 }
 
@@ -223,22 +313,40 @@ button {
 }
 
 .item-button {
-  width: 17%;
-  height: calc(26% - 9px);
-  color: #eee;
+  width: 20%;
+  height: calc(27% - 9px);
+  color: #ddd;
+  text-shadow: 1px 1px rgba(50,50,50,.35);
   background: #e84e27;
-  font-size: 12pt;
+  font-size: 14pt;
   margin-top: 2%;
   margin-bottom: 2%;
-  margin-left: 2.1%;
-  margin-right: 2.1%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
   vertical-align: top;
   box-shadow: 0 9px #999;
 }
 
 .item-button:active {
-  color: #e84e27;
-  background-color: #fff;
+  color: #eef;
+  background-color: #336699;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.flightbar > .flight {
+  width: 15%;
+  height: 100%;
+}
+
+.flightbar > .select {
+  width: 85%;
+  height: 100%;
+}
+
+.flightbar > .select > .option[status="selected"] {
+  color: #eef;
+  background-color: #336699;
   box-shadow: 0 5px #666;
   transform: translateY(4px);
 }
