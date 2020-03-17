@@ -99,7 +99,6 @@
 
 (defn menu
   [attrs]
-  (println attrs)
   [:div.menu
    {}
    [drinks attrs]
@@ -143,24 +142,11 @@
      {:alchemy {:module ::item-list :as :toggle}}
      fa/th-list-solid]
     [:module#item-list.value {:value []}
-        [menu {:alchemy {:module :item-list :as :item-list}
-               :items items}]
-        [:div.background {:alchemy {:module ::item-list} :as :toggle}
-         [:div.panel {:alchemy {:module ::item-list :as :toggle}}
-          [side-panel {:alchemy {:module :item-list :as :list}}]]]]]
+      [menu {:alchemy {:module :item-list :as :item-list}
+             :items items}]
+      [:div.background {:alchemy {:module ::item-list :as :toggle}}
+       [:div.panel {:alchemy {:module ::item-list :as :toggle}}
+        [side-panel {:alchemy {:module :item-list :as :list}}]]]]]
    [:div.options {}
     [:button.close {} mdi/check-all]
     [:button.back {} mdi/chevron-up]]])
-
-
-; (def design
-;   {:transition
-;    {:.item-button
-;      {:on-mouse-down (fn [{:keys [list notifications]}]
-;                        (println "djfklsajfdsakljkl")
-;                        (module/call! list :update conj item)
-;                        (module/call! notifications :notify [:h1 "hello"]))}}})
-
-; (defn view
-;   [params]
-;   (retort/brew design [-view params]))
