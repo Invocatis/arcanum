@@ -1,6 +1,6 @@
 
 body {
-  background: #eef;
+  background: #334;
 }
 
 .notifier {
@@ -80,22 +80,16 @@ button {
   margin-bottom: 20px;
   background: #336;
   box-shadow: 1px 2px 3px 1px rgba(20,20,20,0.75);
-  transition: transform 0.15s ease-out;
+  transition: all 0.3s ease-out;
   transform-origin: top center;
 }
 
 .item-section[status="hidden"] {
-  transform: scaleY(0);
-  padding: 0;
-  margin: 0;
-  box-shadow: none;
-  position: absolute;
-  width: 80%;
+  display: none;
 }
 
 .item-section[status="hidden"] * {
-  transform: scaleY(0);
-  transition: transform 0.15s ease-in-out;
+  display: none;
 }
 
 .item-section > .header {
@@ -275,78 +269,3 @@ button {
 }
 
 /* ---------------------------------- */
-
-.menu {
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 90%;
-}
-
-
-.menu .select {
-  width: 15%;
-  height: 100%;
-  float: left;
-}
-
-.menu .main .option {
-  font-size: 40pt;
-  width: 100%;
-  height: 25%;
-  background: #e84e27;
-  box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
-}
-
-.menu .option[status="selected"] {
-  background-color: #336699;
-}
-
-.section {
-  background: #eef;
-  height: 280px;
-  width: 40%;
-  box-shadow: 1px 2px 3px 1px rgba(100,100,100,0.75);
-  float: left;
-  margin-right: 3%;
-  margin-bottom: 5%;
-}
-
-.item-button {
-  width: 20%;
-  height: calc(27% - 9px);
-  color: #ddd;
-  text-shadow: 1px 1px rgba(50,50,50,.35);
-  background: #e84e27;
-  font-size: 14pt;
-  margin-top: 2%;
-  margin-bottom: 2%;
-  margin-left: 2.5%;
-  margin-right: 2.5%;
-  vertical-align: top;
-  box-shadow: 0 9px #999;
-}
-
-.item-button:active {
-  color: #eef;
-  background-color: #336699;
-  box-shadow: 0 5px #666;
-  transform: translateY(4px);
-}
-
-.flightbar > .flight {
-  width: 15%;
-  height: 100%;
-}
-
-.flightbar > .select {
-  width: 85%;
-  height: 100%;
-}
-
-.flightbar > .select > .option[status="selected"] {
-  color: #eef;
-  background-color: #336699;
-  box-shadow: 0 5px #666;
-  transform: translateY(4px);
-}

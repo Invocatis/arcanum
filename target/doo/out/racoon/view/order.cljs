@@ -1,5 +1,6 @@
 (ns racoon.view.order
   (:require
+   [retort.core :as retort]
    [reagent.core :as r]))
 
 (defn item-element
@@ -37,14 +38,14 @@
        [:div.menu-content {}]
        (map (fn [[title categories]] [page {:title title :categories categories}]) menu))]])
 
-(defn design
+(defn menu-design
   [state]
   {:transititon
    {:.item {:on-click #(swap! state update-in [:sale :items] conj (:item %))}}})
 
 (defn menu
   [attrs state]
-  (retort/brew (design state) [-menu attrs]))
+  (retort/brew (menu-design state) [-menu attrs]))
 
 (defn item-entry
   [{:keys [item count]}]
@@ -70,7 +71,7 @@
    [sale-list {:items (:items sale)}]
    [checkout {}]])
 
-(defn design
+(defn sale-design
   [state]
   {:data
    {:saleElement
@@ -78,7 +79,7 @@
 
 (defn sale
   [attrs state]
-  (retort/brew (design state) [saleElement attrs]))
+  (retort/brew (sale-design state) [saleElement attrs]))
 
 (def m
   {:appetizers {}

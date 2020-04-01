@@ -16,16 +16,17 @@ return retort.core.brew.call(null,design,acc);
 racoon.core.render = (function racoon$core$render(){
 return reagent.core.render.call(null,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [racoon.core.base], null),document.getElementById("app"));
 });
+goog.exportSymbol('racoon.core.render', racoon.core.render);
 racoon.core._main = (function racoon$core$_main(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___4625 = arguments.length;
-var i__4731__auto___4626 = (0);
+var len__4730__auto___5060 = arguments.length;
+var i__4731__auto___5061 = (0);
 while(true){
-if((i__4731__auto___4626 < len__4730__auto___4625)){
-args__4736__auto__.push((arguments[i__4731__auto___4626]));
+if((i__4731__auto___5061 < len__4730__auto___5060)){
+args__4736__auto__.push((arguments[i__4731__auto___5061]));
 
-var G__4627 = (i__4731__auto___4626 + (1));
-i__4731__auto___4626 = G__4627;
+var G__5062 = (i__4731__auto___5061 + (1));
+i__4731__auto___5061 = G__5062;
 continue;
 } else {
 }
@@ -43,9 +44,9 @@ return racoon.core.render.call(null);
 racoon.core._main.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-racoon.core._main.cljs$lang$applyTo = (function (seq4624){
+racoon.core._main.cljs$lang$applyTo = (function (seq5059){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq.call(null,seq4624));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq.call(null,seq5059));
 });
 
 

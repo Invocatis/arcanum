@@ -21,7 +21,7 @@
         [view/base {}]])
     (component/design)))
 
-(defn render
+(defn ^:export render
   []
   (reagent/render [base] (.getElementById js/document "app")))
 
