@@ -1,1 +1,0 @@
-{:output-dir "target/doo/out", :externs ["closure-js/externs"], :optimizations :none, :output-to "target/doo/test.js", :output-wrapper false, :libs ["closure-js/libs"], :target :nodejs, :main motif.runner, :language-in :ecmascript5}
