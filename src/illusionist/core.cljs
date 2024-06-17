@@ -1,8 +1,13 @@
 (ns illusionist.core
   (:require
+    [sablono.core :as html :refer-macros [html]]
     [reagent.core :as reagent]
     [reagent.dom :as rd]
+    [reagent.ratom :refer [ratom]]
     [retort.core :as retort]
+    [retort.compiler :as compiler]
+    [retort.compiler.react :refer [make-compiler]]
+    [retort.compiler.reagent :as reagent-compiler]
     [arcanum.registrar :as registrar]
     [arcanum.component :as component]
     [arcanum.module :as module]
@@ -11,11 +16,12 @@
     [illusionist.router :refer [app-routes]]
     [illusionist.view.tabpage :as tabpage]
     [illusionist.client :as client]
-    [illusionist.data.design :as data]))
+    [illusionist.data.design :as data]
+    ["react-dom" :as rdom]))
 
 (defonce route (reagent/atom {}))
 
-(defonce state (reagent/atom {}))
+; (defonce state (reagent/atom {}))
 
 (defmulti current-page :page)
 
@@ -42,13 +48,13 @@
 (defn rand-name []
   (clojure.string/capitalize (clojure.string/join " " (take (+ 2 (rand-int 5)) (shuffle words)))))
 
-(def desserts (reagent/atom ()))
+(def state (reagent/atom []))
 
-; (add-watch desserts :asdf (fn [k r o n] (println n)))
+; (add-watch state :asdf (fn [k r o n] (println n)))
 
 (defn make-a-dessert [e]
-  (swap! desserts conj {:id (random-uuid)
-                        :name (rand-name)}))
+  (swap! state conj {:id (random-uuid)
+                     :name (rand-name)}))
 
 (defn make-many-desserts [n]
   (dotimes [i n]
@@ -58,45 +64,32 @@
   (str "#" (.toString (bit-and (hash x) 0xFFFFFF) 16)))
 
 (defn dessert-item [attr {:keys [id name]}]
-  ; (println 'render! name)
-  [:li.dessert
-   {:key id}
+  [:li.dessert {:id id}
    [:div {}
     [:svg {:width 50 :height 50}
-     [:circle
-      {:r 20 :cx 25 :cy 25 :fill (color-for name)}]
+     [:circle.retort
+      {:r 20 :cx 25 :cy 25 :name name}]
      [:rect {:x 15 :y 15 :width 20 :height 20}]]
     [:span [:em [:strong {} name]]]]])
 
 (defn h1 [{:keys [value]}]
   [:h1 {} (:name value)])
 
-(defn d [{:keys [desserts] :as attr}]
+(defn desserts [{:keys [desserts]}]
   (into
     [:ol {}]
-    (for [dessert @desserts]
-      [:div {}
-       [:button.stinky "stinky"]
-       [dessert-item {:key (:id dessert)} dessert]])))
+    (for [dessert (reverse desserts)]
+      [dessert-item {:key (str (:id dessert))} dessert])))
 
-(defn b
-  [attrs]
-  [:div {}
-   [:button.maker {:n 1} "Invent a new dessert"]
-   [:button.maker {:n 100} "Invent 100 new desserts"]
-   [:button.maker {:n 1000} "Invent 1000 new desserts"]
-   [d {}]])
 
 (defn dessertinator
   []
-  ; (println (.-watches desserts))
-  ; (println (count @desserts))
-  (time
-    (retort/brew
-     {:d {:desserts desserts}
-      :button.maker {:on-click #(make-many-desserts (:n %))}
-      :button.stinky {:on-click #(println "stinky")}}
-     [b {}])))
+  [:div.dessertinator {}
+   [:button.maker {:n 1} "Invent a new dessert"]
+   [:button.maker {:n 100} "Invent 100 new desserts"]
+   [:button.maker {:n 1000} "Invent 1000 new desserts"]
+   [desserts {:id "desserts"}]])
+
 
 ; =====
 
@@ -117,9 +110,6 @@
 ;         [tabpage/base {}]])
 ;     (component/design)))
 
-(defn base
-  []
-  [dessertinator])
 
 ; (defn h1
 ;   [{:keys [value] :as attrs}]
@@ -146,10 +136,41 @@
 ;     [:button {:on-click #(swap! state1 inc) :style {:width "150px" :height "150px"}} '+]
 ;     [:button {:on-click #(swap! state2 inc) :style {:width "150px" :height "150px"}} '+]]))
 
+(defn something
+  [hiccup]
+  (cond
+    (vector? hiccup)
+    (let [[tag & more] hiccup]
+      (if (fn? tag)
+        (something (apply tag more))
+        (into [tag] (map something more))))
+
+    :else
+    hiccup))
+
+(def compiler (make-compiler))
+
+(def design
+  {:desserts {:desserts []}
+   :.dessertinator>button.maker {:on-click (fn [_ {:keys [n]}] (fn [_] (make-many-desserts n)))}
+   :circle {:fill (fn [_ {:keys [name]}] (color-for name))}
+   :li {:on-click (fn [_ {:keys [id]}] (fn [_] (swap! state (partial remove #(= (:id %) id)))))}})
 
 (defn ^:export render
   []
-  (rd/render [base] (.getElementById js/document "app")))
+  ; (binding [reagent-compiler/context {:value [dessertinator] :siblings [[dessertinator]] :position 0}]))
+  (let [context {:value [dessertinator] :siblings [[dessertinator]] :position 0}]
+    (rd/render [(retort/precompile design state context dessertinator)]
+               (.getElementById js/document "app"))))
+    ; (rd/render [dessertinator] (.getElementById js/document "app") (reagent-compiler/create-compiler design state nil))))
+  ; (rdom/render (compiler/-element compiler design state [dessertinator]) (.getElementById js/document "app")))
+
+; (let [timeout (volatile! nil)]
+;   (add-watch desserts :render
+;              (fn [& _]
+;                (when @timeout
+;                  (js/clearTimeout @timeout))
+;                (vreset! timeout (js/setTimeout render 5)))))
 
 (defn -main
   [& args]

@@ -1,5 +1,4 @@
 (ns illusionist.data.model.tab
-  (:require
-   [fritz.core :as fritz]))
+  (:require))
 
 (def list)

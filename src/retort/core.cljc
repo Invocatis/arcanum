@@ -1,99 +1,194 @@
 (ns retort.core
   (:require
+    [reagent.core :as reagent]
     [retort.hiccup :as hiccup]
     [retort.selector :as selector :refer [selects?]]
-    [retort.util :refer [multifn?]]))
+    [retort.util :refer [multifn?]])
+  (:refer-clojure :exclude [resolve]))
+
+(defn eldest
+  ([context]
+   (when context
+     (:parent context context)))
+  ([context key]
+   (when context
+     (or (eldest (:parent context) key)
+         (get context key)))))
+
+(defn youngest
+  [context key]
+  (when context
+    (if (contains? context key)
+      (get context key)
+      (recur (:parent context) key))))
 
 (defn ancestory
-  [context]
-  (if-let [parent (get context :parent)]
-    (cons (dissoc context :parent) (ancestory parent))
-    (list context)))
+  [context key]
+  (when context
+    (lazy-seq
+     (cons (get context key) (ancestory (:parent context) key)))))
 
-(def used (atom {}))
+(defn focus
+  [context index]
+  (let [children (hiccup/children (:value context))]
+    ; (println children (:value context))
+    {:parent context
+     :siblings children
+     :value (nth children index)
+     :position index}))
 
-(def cached (atom {}))
+; (defn focus*
+;   [context hiccup]
+;   (map (partial focus context hiccup) (range (count (hiccup/children hiccup)))))
 
-(defn inject
-  [data hiccup]
-  (let [data (into {} (map (fn [[k v]] [k (if (fn? v) (partial v (second hiccup)) v)]) data))]
-    (cond
-      (map? data)
-      (update hiccup 1 merge data)
-
-      (vector? data)
-      data
-
-      (fn? data)
-      (recur (data hiccup) hiccup))))
+(defn design-merge
+  [& _])
 
 (defn context-defaults
-  [hiccup {:keys [position siblings] :or {position 0 siblings [hiccup]} :as context}]
-  (assoc context :position position :siblings siblings))
+  [hiccup {:keys [position siblings] :or {position 0} :as context}]
+  (assoc context :position position :siblings (or siblings (hiccup/children hiccup))))
 
 (defn trim-design
   [design hiccup context]
   (into {} (filter (fn [[k v]] (selects? k hiccup context)) design)))
 
-(defn hookup
-  [design hiccup]
-  (reduce (fn [hiccup value] (inject value hiccup)) hiccup (vals design)))
+(defn -select
+  [design context hiccup]
+  ; (println context)
+  (->> design
+       (filter (fn [[k _]] (selects? k hiccup context)))
+       (into {})))
 
-(defn brew*
-  [design hiccup & [context]]
-  (let [design (trim-design design hiccup context)]
-    ; (println hiccup design (get @used hiccup))
-    (cond
-      (= design (get @used hiccup))
-      (if (empty? design)
-        hiccup
-        (get @cached hiccup))
+(def select (memoize -select))
 
-      :else
-      (let [hicc (hiccup/clean hiccup)
-            hicc (hookup design hicc)
-            [tag attrs & children] hicc]
+(def cache (atom {}))
 
-        (swap! cached assoc hiccup hicc)
-        (swap! used update hiccup merge design)
-        (doseq [{:keys [siblings position] :as context} (ancestory context)]
-          (swap! used update (get siblings position) merge design))
+(defn derefable?
+  [x]
+  (satisfies? #?(:clj clojure.lang.IDeref :cljs IDeref ) x))
 
-        hicc))))
+(defn wrap-for-deref
+  [f selections]
+  (if (keyword? f)
+    f
+    (fn [props & children]
+      (apply
+        f
+        (reduce
+         (fn [props k]
+           (update props k #(if (derefable? %) (deref %) %)))
+         props
+         (mapcat keys (vals selections)))
+        children))))
+
+
+(defn fufill
+  [hiccup selections state]
+  (if (or (empty? selections) (= (get @cache hiccup) selections))
+    hiccup
+    (let [x
+          (into
+           [(wrap-for-deref (hiccup/tag hiccup) selections)
+            (reduce
+             (fn [acc selection]
+               (->> selection
+                    (map (fn [[k v]]
+                           [k (cond
+                                (vector? v)
+                                (if (empty? v)
+                                  state
+                                  (if (derefable? state)
+                                    (reagent/cursor state v)
+                                    (get-in state v)))
+
+                                (fn? v) (apply v hiccup)
+
+                                :else
+                                v)]))
+                    (into acc)))
+             (hiccup/props hiccup)
+             (vals selections))]
+           (hiccup/children hiccup))]
+      (swap! cache assoc hiccup x)
+      x)))
+
+(defn resolve
+  [[tag & args :as hiccup]]
+  (if (fn? tag)
+    (apply tag args)
+    hiccup))
 
 (defn brew
-  [design hiccup & [context]]
-  (let [context (or context (context-defaults hiccup context))]
+  [design state hiccup]
+  (cond
+    (vector? hiccup)
     (cond
-      (vector? hiccup)
-      (let [[tag & more] (hiccup/clean hiccup)
-            hicc (brew* design hiccup context)]
-        [(fn []
-           (let [[tag] hicc
-                 hicc (if (fn? tag) (apply tag (rest hicc)) hicc)
-                 children (hiccup/children hicc)]
-             (println children)
-             (into (if (> (count hicc) 2)
-                     (subvec hicc 0 2)
-                     hicc)
-                   (map-indexed
-                    (fn [i child]
-                      (brew design child {:position i
-                                          :parent context
-                                          :siblings children}))
-                    children))))])
+      (fn? (first hiccup))
+      (let [selections (select design nil hiccup)]
+        (if (empty? selections)
+          hiccup
+          (fufill hiccup selections state)))
 
-      (seq? hiccup)
-      (map #(brew design % context) hiccup)
+      (keyword? (first hiccup))
+      (let [selections (select design nil hiccup)]
+        (hiccup/update-children
+         (if (empty? selections)
+           hiccup
+           (fufill hiccup selections state))
+         (partial map (partial brew design state)))))
 
-      :else
-      hiccup)))
 
-(defn design-merge
-  ([d0] d0)
-  ([d0 d1]
-   {:mold (merge (:mold d0) (:mold d1))
-    :data (merge-with merge (:data d0) (:data d1))
-    :transition (merge-with (partial merge-with comp) (:transition d0) (:transition d1))})
-  ([d0 d1 & more]
-   (reduce design-merge (design-merge d0 d1) more)))
+    :else
+    hiccup))
+
+(declare precompile)
+
+(defn brew-with-precompile
+  [design state context hiccup]
+  (cond
+    (vector? hiccup)
+    (cond
+      (fn? (first hiccup))
+      (let [selections (select design context hiccup)]
+        (hiccup/update-tag
+         (if (empty? selections)
+           hiccup
+           (fufill hiccup selections state))
+         (partial precompile design state context)))
+
+      (keyword? (first hiccup))
+      (let [selections (select design context hiccup)]
+        (hiccup/update-children
+         (if (empty? selections)
+           hiccup
+           (fufill hiccup selections state))
+         (partial map (fn [i form] (brew-with-precompile design state (focus context i) form)) (range)))))
+
+
+    :else
+    hiccup))
+
+(def precompile-cache
+  (atom {}))
+
+(def brew-cache
+  (atom {}))
+
+(defn cache!
+  [cache key val]
+  (swap! cache assoc key val)
+  val)
+
+(defn precompile
+  [design state context comp]
+  (or (get @precompile-cache comp)
+      (cache! precompile-cache comp
+       (fn [& args]
+         (let [hiccup (into [comp] args)
+               brewed (-> (brew design state hiccup)
+                          resolve
+                          (update 0 (fn [tag] (if (fn? tag) (precompile design state context tag) tag))))
+               context (assoc context
+                              :value brewed
+                              :siblings (hiccup/children brewed))]
+           (brew-with-precompile design state context brewed))))))

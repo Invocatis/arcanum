@@ -49,8 +49,13 @@
     (keyword? (first hiccup))
     (-> hiccup first tag->html-tag)
     (fn? (first hiccup))
-    (keyword (fn-name (first hiccup)))
-    :else nil))
+    (first hiccup)
+    :else
+    nil))
+
+(defn update-tag
+  [hiccup f]
+  (update hiccup 0 f))
 
 (defn classes
   [hiccup]
@@ -76,6 +81,16 @@
   (when (map? (second hiccup))
       (-> (second hiccup))))
 
+(defn props
+  [hiccup]
+  (if (map? (second hiccup))
+    (second hiccup)
+    {}))
+
+(defn prop
+  [hiccup prop]
+  (-> hiccup props (get prop)))
+
 (defn children
   [hiccup]
   (if (map? (second hiccup))
@@ -83,6 +98,12 @@
       (subvec hiccup 2))
     (when (> (count hiccup) 1)
       (subvec hiccup 1))))
+
+(defn update-children
+  [hiccup f]
+  (into [(tag hiccup)
+         (props hiccup)]
+        (f (children hiccup))))
 
 (defn clean
   [hiccup]
@@ -99,3 +120,13 @@
      {:id (id hiccup)
       :class (apply str (classes hiccup))})]
    children))
+
+(defn decompose
+  [hiccup]
+  {:tag (tag hiccup)
+   :props (merge (props hiccup)
+                 (when-let [id (id hiccup)]
+                   {:id id})
+                 (when-let [classes (classes hiccup)]
+                   {:class (apply str classes)}))
+   :children (children hiccup)})
